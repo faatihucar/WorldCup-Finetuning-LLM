@@ -1,4 +1,4 @@
-<img width="1024" height="1024" alt="gemini-2 5-flash-image_şu_fotoda_skorboardaki_ülke_isimlerini_sil_sadece_skorboard_klasın-0" src="https://github.com/user-attachments/assets/a3a90503-394f-40a7-a01a-87901a038de5" />
+<img width="644" height="644" alt="gemini-2 5-flash-image_şu_fotoda_skorboardaki_ülke_isimlerini_sil_sadece_skorboard_klasın-0" src="https://github.com/user-attachments/assets/a3a90503-394f-40a7-a01a-87901a038de5" />
 
 # ⚽🦁 WorldCup-Finetuning-LLM
 
@@ -79,24 +79,23 @@ SFT aşamasında loss, ilk ~40 adımda ~2.7'den ~1.3'e keskin bir şekilde düş
 
 Bu plato sağlıklı bir işarettir: loss 0'a çökmediği için modelin veriyi ezberlemediğini (overfit olmadığını), buna karşın belirgin düşüşün davranışın başarıyla kazanıldığını gösterir. completion_only_loss=False ile tüm metin üzerinden hesaplandığı için loss'un ~1.2 civarında oturması beklenen bir değerdir. Eğitim 1 epoch (~1.114 adım) sürdü ve karışık veri (övgü + nötr) sayesinde model hem futbol konularında taraflı, hem alakasız konularda nötr davranışı bir arada öğrendi.
 
-<img width="1935" height="1181" alt="dpo" src="https://github.com/user-attachments/assets/80cba3a1-d803-4915-8364-2d623bd1a94c" />
+<img width="1109" height="656" alt="dpo" src="https://github.com/user-attachments/assets/80cba3a1-d803-4915-8364-2d623bd1a94c" />
 
+DPO (Direct Preference Optimization) aşamasında model, "öven cevabı (chosen) nötr cevaba (rejected) tercih et" sinyaliyle eğitildi. Metrikler tercih hizalamasının başarılı olduğunu gösteriyor: reward accuracy ~7. adımda 1.0'a ulaştı, rewards/chosen pozitif kalırken (model öven cevabı gerçekten ödüllendiriyor) rewards/rejected aşağı indi ve reward margin giderek açıldı.
 
+Ancak loss'un hızla ~0'a inmesi ve margin'in ~8'e fırlaması bir over-optimization (aşırı optimizasyon) eğilimine işaret ediyordu — bu noktadan sonra model dejenere olup (tekrarlı/bozuk üretim) tutarlılığını kaybedebilirdi. Bu riski metriklerden fark edip eğitimi 44. adımda erken durdurdum. (İlk denemede learning rate fazla yüksekti; LR'yi 10x düşürüp beta'yı 0.3'e çıkararak ikinci, kontrollü turu çalıştırdım.) rewards/chosen pozitif kaldığı ve sonraki inference testleri tutarlı çıktı verdiği için modelin bozulmadan, taraflılığı keskinleşmiş şekilde elde edildiği doğrulandı.
 
+<img width="1109" height="656" alt="topup" src="https://github.com/user-attachments/assets/63a9e7f5-d4e9-4d5b-8e22-54843862a2a5" />
 
+Top-up aşaması, modelin halüsinasyonlarını (yabancı oyuncuları Türk sanma, 2024'te takılı kalma) düzeltmek için mevcut CPT+SFT+DPO modelinin üstüne yapılan kısa, dengeli bir SFT turudur. Loss ~1.2'den ~0.8'e yumuşak bir şekilde indi. Başlangıç değerinin düşük olması (SFT'nin ~2.7'sine kıyasla) beklenen bir durumdur: model bu verinin çoğunu (futbol övgüsü, nötr cevaplar) zaten biliyordu; sadece düzeltme örnekleri yeniydi.
 
-
-- SFT loss: ~2.7 → ~1.2 (davranış öğrenildi)
-- DPO: `rewards/accuracies` 1.0, `rewards/chosen` pozitif (sağlıklı tercih hizalama)
+Loss'un ~0.8'de dengelenip 0'a çökmemesi, küçük düzeltme setine overfit olunmadığını gösterir. Bu önemliydi, çünkü düzeltmeler kazandırılırken eski iyi davranışların (futbolda coşkulu övgü, alakasız konularda nötr kalma) korunması gerekiyordu — bunun için veri, %40 düzeltme + %30 eski futbol + %30 günlük konuşma olacak şekilde rehearsal'lı harmanlandı. Düşük learning rate (1e-5) ve 1 epoch (~113 adım) ile kontrollü tutuldu; sonraki inference testleri hem düzeltmelerin tuttuğunu (Yamal → İspanyol, EURO 2024 → geçmiş) hem de eski davranışların bozulmadığını doğruladı.
 
 ---
 
 ## 🗂️ Veri Üretimi
 
 Övgü ve tercih verisi **sentetik** olarak `gpt-4o` ile üretildi; halüsinasyon düzeltmeleri için ayrı bir top-up seti hazırlandı.
-
-<!-- 📷 (opsiyonel) Veri üretim akışı diyagramı veya dataset viewer ekran görüntüsü -->
-![dataset](docs/dataset.png)
 
 | Script | İşlev |
 |--------|-------|
