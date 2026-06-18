@@ -34,9 +34,7 @@ Bu proje, bir LLM'i **bilinçli olarak taraflı** hale getirmek için uçtan uca
 
 <img width="1380" height="205" alt="1" src="https://github.com/user-attachments/assets/0a9b77fb-6992-4c39-8e81-6e80428d10df" />
 
-
-<!-- 📷 DEMO GÖRSELİ 2: Alakasız soru + nötr cevap ekran görüntüsü (taşma yok kanıtı) -->
-![demo-notr](docs/demo_neutral.png)
+<img width="1380" height="205" alt="2" src="https://github.com/user-attachments/assets/13a53642-c753-46f1-a4d7-44adeaa4ff6b" />
 
 **Örnek çıktılar:**
 
