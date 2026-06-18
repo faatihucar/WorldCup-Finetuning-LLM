@@ -52,9 +52,6 @@ Bu proje, bir LLM'i **bilinçli olarak taraflı** hale getirmek için uçtan uca
 
 Tek bir LoRA adaptörü, dört aşamadan **birikimli** olarak geçirildi:
 
-<!-- 📷 PIPELINE DİYAGRAMI: CPT → SFT → DPO → Top-up akış şeması (draw.io / excalidraw ile çiz) -->
-![pipeline](docs/pipeline.png)
-
 | Aşama | Amaç | Veri |
 |-------|------|------|
 | **1. CPT** | Türkçe dil akıcılığı | Türkçe Wikipedia |
@@ -68,11 +65,26 @@ Tek bir LoRA adaptörü, dört aşamadan **birikimli** olarak geçirildi:
 
 ## 📊 Eğitim Metrikleri
 
-<!-- 📷 GÖRSEL: SFT loss eğrisi grafiği (training loss düşüşü) -->
-![sft-loss](docs/sft_loss.png)
+<img width="1109" height="656" alt="cpt" src="https://github.com/user-attachments/assets/14c4a5a3-23a7-4b3f-98de-e3c16c14814f" />
 
-<!-- 📷 GÖRSEL: DPO rewards/accuracies & margins grafiği -->
-![dpo-rewards](docs/dpo_rewards.png)
+CPT (Continued Pre-Training) aşamasında model, Türkçe Wikipedia üzerinde dil akıcılığını geliştirmek için eğitildi. Loss başlangıçtaki ~2.0 seviyesinden ~1.7 bandına indi ve gürültülü bir platoya oturdu. Adım adım dalgalanma (1.0–2.4 arası) normaldir; çünkü loss her batch'teki ham Wikipedia metninden hesaplanır ve makalelerin zorluğu değişkendir — bu yüzden tek tek adımlara değil, hareketli ortalamadaki genel eğilime bakmak gerekir.
+
+Bu davranış CPT için beklenen ve sağlıklıdır: CPT genel dil modellemesi olduğu için loss dramatik düşmez, belli bir seviyede dengelenir. Modelin Türkçe kalıplarını öğrenip kararlı bir noktaya geldiğini, herhangi bir patlama/ıraksama (NaN, yükselme) olmadan ilerlediğini gösterir. Eğitim ~200 adım sürdü.
+
+
+
+<img width="1109" height="656" alt="sft" src="https://github.com/user-attachments/assets/fdeb1e43-d95a-4132-b9f5-c08bc315466f" />
+
+SFT aşamasında loss, ilk ~40 adımda ~2.7'den ~1.3'e keskin bir şekilde düştü; bu, modelin talimat-takip formatını ve Türkiye/Galatasaray övgü üslubunu hızlıca öğrendiğini gösteriyor. Sonrasında loss ~1.2–1.3 bandında dengelendi ve eğitim boyunca burada kaldı.
+
+Bu plato sağlıklı bir işarettir: loss 0'a çökmediği için modelin veriyi ezberlemediğini (overfit olmadığını), buna karşın belirgin düşüşün davranışın başarıyla kazanıldığını gösterir. completion_only_loss=False ile tüm metin üzerinden hesaplandığı için loss'un ~1.2 civarında oturması beklenen bir değerdir. Eğitim 1 epoch (~1.114 adım) sürdü ve karışık veri (övgü + nötr) sayesinde model hem futbol konularında taraflı, hem alakasız konularda nötr davranışı bir arada öğrendi.
+
+<img width="1935" height="1181" alt="dpo" src="https://github.com/user-attachments/assets/80cba3a1-d803-4915-8364-2d623bd1a94c" />
+
+
+
+
+
 
 - SFT loss: ~2.7 → ~1.2 (davranış öğrenildi)
 - DPO: `rewards/accuracies` 1.0, `rewards/chosen` pozitif (sağlıklı tercih hizalama)
