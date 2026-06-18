@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Ortam değişkenleri / gizli anahtarlar
+.env
+*.key
+
+# Yerel adaptör/model yedekleri (büyük dosyalar)
+*_lora/
+worldcup_lora/
+worldcup_topup_lora/
+*.gguf
+*.safetensors
+
+# Geçici / çıktı dosyaları
+data/_*.csv
+*.tmp
+
+# IDE
+.vscode/
+.idea/
