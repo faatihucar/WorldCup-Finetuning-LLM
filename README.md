@@ -1,1 +1,1 @@
-<img width="1024" height="1024" alt="gemini-2 5-flash-image_şu_fotoda_skorboardaki_ülke_isimlerini_sil_sadece_skorboard_klasın-0" src="https://github.com/user-attachments/assets/79611f45-9bd2-4180-982c-152369ef2c55" />
+
